@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { uid } from "uid";
 import ActivityForm from "./components/form.js";
 import List from "./components/list.js";
@@ -14,17 +14,22 @@ function App() {
 
   const [weather, setWeather] = useState();
 
-  async function loadWeather() {
-    try {
-      const response = await fetch(URL);
-      const data = await response.json();
-      setWeather(data.isGoodWeather);
-    } catch (error) {
-      console.log(error);
+  useEffect(() => {
+    async function loadWeather() {
+      try {
+        const response = await fetch(URL);
+        const data = await response.json();
+        setWeather(data.isGoodWeather);
+      } catch (error) {
+        console.log(error);
+      }
     }
-  }
-
-  loadWeather();
+    loadWeather();
+    const interval = setInterval(loadWeather, 5000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   function handleAddActivity(newActivity) {
     setActivities([...activities, { ...newActivity, id: uid() }]);
@@ -49,10 +54,3 @@ function App() {
 }
 
 export default App;
-
-// Switch to the App.js and
-
-// create a state for activities,
-// write a function handleAddActivity which accepts a new activity object as parameter and adds this object to the activities state
-// please add a unique id to every new activity object; you can use uid to do so.
-// Pass handleAddActivity to the Form component; make sure to use the correct prop name.
